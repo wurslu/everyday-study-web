@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>每日学习助手 - AI 智能学习内容推荐</title>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+			rel="stylesheet"
+		/>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			:root {
+				--primary-color: #667eea;
+				--secondary-color: #764ba2;
+				--accent-color: #f093fb;
+				--text-dark: #2d3748;
+				--text-light: #718096;
+				--bg-light: #f7fafc;
+				--bg-white: #ffffff;
+				--border-color: #e2e8f0;
+				--success-color: #48bb78;
+				--warning-color: #f6ad55;
+				--error-color: #f56565;
+				--gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				--gradient-card: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+				--shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+				--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+				--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+				--shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+			}
+
+			body {
+				font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+					sans-serif;
+				line-height: 1.6;
+				color: var(--text-dark);
+				background: var(--bg-light);
+			}
+
+			/* 索引页面样式 */
+			.landing-page {
+				min-height: 100vh;
+				background: var(--gradient-primary);
+				position: relative;
+				overflow: hidden;
+			}
+
+			.landing-page::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.05)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.05)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.03)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+				animation: float 6s ease-in-out infinite;
+			}
+
+			@keyframes float {
+				0%,
+				100% {
+					transform: translateY(0px) rotate(0deg);
+				}
+				50% {
+					transform: translateY(-20px) rotate(1deg);
+				}
+			}
+
+			.landing-container {
+				position: relative;
+				z-index: 1;
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 2rem;
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				text-align: center;
+			}
+
+			.hero-section {
+				color: white;
+				margin-bottom: 4rem;
+			}
+
+			.hero-title {
+				font-size: 3.5rem;
+				font-weight: 700;
+				margin-bottom: 1.5rem;
+				background: linear-gradient(45deg, #fff, #f0f8ff);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				animation: slideInDown 1s ease-out;
+			}
+
+			.hero-subtitle {
+				font-size: 1.25rem;
+				margin-bottom: 2rem;
+				opacity: 0.9;
+				animation: slideInUp 1s ease-out 0.2s both;
+			}
+
+			.hero-description {
+				font-size: 1.1rem;
+				margin-bottom: 3rem;
+				opacity: 0.8;
+				max-width: 600px;
+				animation: fadeIn 1s ease-out 0.4s both;
+			}
+
+			@keyframes slideInDown {
+				from {
+					opacity: 0;
+					transform: translateY(-50px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			@keyframes slideInUp {
+				from {
+					opacity: 0;
+					transform: translateY(50px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+				}
+				to {
+					opacity: 1;
+				}
+			}
+
+			.features-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+				gap: 2rem;
+				margin-bottom: 3rem;
+				animation: slideInUp 1s ease-out 0.6s both;
+			}
+
+			.feature-card {
+				background: rgba(255, 255, 255, 0.1);
+				backdrop-filter: blur(10px);
+				border: 1px solid rgba(255, 255, 255, 0.2);
+				border-radius: 16px;
+				padding: 2rem;
+				text-align: center;
+				transition: all 0.3s ease;
+				color: white;
+			}
+
+			.feature-card:hover {
+				transform: translateY(-5px);
+				background: rgba(255, 255, 255, 0.15);
+				box-shadow: var(--shadow-xl);
+			}
+
+			.feature-card:active {
+				transform: translateY(-2px);
+			}
+
+			.feature-icon {
+				font-size: 3rem;
+				margin-bottom: 1rem;
+				background: var(--gradient-card);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+			}
+
+			.feature-title {
+				font-size: 1.25rem;
+				font-weight: 600;
+				margin-bottom: 0.5rem;
+			}
+
+			.feature-desc {
+				opacity: 0.8;
+				font-size: 0.95rem;
+			}
+
+			.cta-button {
+				background: var(--gradient-card);
+				color: white;
+				border: none;
+				padding: 1rem 2.5rem;
+				font-size: 1.1rem;
+				font-weight: 600;
+				border-radius: 50px;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				box-shadow: var(--shadow-lg);
+				animation: pulse 2s infinite;
+			}
+
+			.cta-button:hover {
+				transform: translateY(-2px);
+				box-shadow: var(--shadow-xl);
+				animation: none;
+			}
+
+			@keyframes pulse {
+				0% {
+					box-shadow: 0 0 0 0 rgba(240, 147, 251, 0.4);
+				}
+				70% {
+					box-shadow: 0 0 0 10px rgba(240, 147, 251, 0);
+				}
+				100% {
+					box-shadow: 0 0 0 0 rgba(240, 147, 251, 0);
+				}
+			}
+
+			/* 应用页面样式 */
+			.app-page {
+				display: none;
+				min-height: 100vh;
+				background: var(--bg-light);
+			}
+
+			.app-header {
+				background: var(--bg-white);
+				border-bottom: 1px solid var(--border-color);
+				padding: 1rem 0;
+				box-shadow: var(--shadow-sm);
+				position: sticky;
+				top: 0;
+				z-index: 100;
+			}
+
+			.header-container {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 0 2rem;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.app-logo {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				font-size: 1.5rem;
+				font-weight: 700;
+				background: var(--gradient-primary);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+			}
+
+			.status-indicator {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				padding: 0.5rem 1rem;
+				border-radius: 50px;
+				font-size: 0.875rem;
+				font-weight: 500;
+			}
+
+			.status-online {
+				background: rgba(72, 187, 120, 0.1);
+				color: var(--success-color);
+			}
+
+			.status-offline {
+				background: rgba(245, 101, 101, 0.1);
+				color: var(--error-color);
+			}
+
+			.app-main {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 2rem;
+			}
+
+			.learning-tabs {
+				display: flex;
+				gap: 1rem;
+				margin-bottom: 2rem;
+				flex-wrap: wrap;
+			}
+
+			.tab-button {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				padding: 0.75rem 1.5rem;
+				border: 2px solid var(--border-color);
+				background: var(--bg-white);
+				border-radius: 50px;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				font-weight: 500;
+				color: var(--text-light);
+			}
+
+			.tab-button.active {
+				background: var(--gradient-primary);
+				border-color: transparent;
+				color: white;
+				transform: translateY(-2px);
+				box-shadow: var(--shadow-md);
+			}
+
+			.tab-button:hover:not(.active) {
+				border-color: var(--primary-color);
+				transform: translateY(-1px);
+			}
+
+			.learning-content {
+				display: block;
+			}
+
+			.content-card {
+				background: var(--bg-white);
+				border-radius: 16px;
+				padding: 2rem;
+				box-shadow: var(--shadow-md);
+				border: 1px solid var(--border-color);
+			}
+
+			.content-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 1.5rem;
+				padding-bottom: 1rem;
+				border-bottom: 1px solid var(--border-color);
+				gap: 2rem;
+			}
+
+			.content-type {
+				font-size: 1.25rem;
+				font-weight: 600;
+				color: var(--text-dark);
+			}
+
+			.refresh-button {
+				background: rgba(102, 126, 234, 0.1);
+				color: var(--primary-color);
+				border: 2px solid rgba(102, 126, 234, 0.2);
+				padding: 0.5rem 1rem;
+				border-radius: 12px;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				font-weight: 500;
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				font-size: 0.9rem;
+			}
+
+			.refresh-button:hover:not(:disabled) {
+				background: rgba(102, 126, 234, 0.15);
+				border-color: rgba(102, 126, 234, 0.4);
+				transform: translateY(-1px);
+				box-shadow: var(--shadow-sm);
+			}
+
+			.refresh-button:disabled {
+				opacity: 0.5;
+				cursor: not-allowed;
+				transform: none;
+				background: rgba(102, 126, 234, 0.05);
+			}
+
+			.refresh-button .icon {
+				transition: transform 0.3s ease;
+			}
+
+			.refresh-button:hover:not(:disabled) .icon {
+				transform: rotate(90deg);
+			}
+
+			.content-main {
+				font-size: 1.5rem;
+				line-height: 1.8;
+				margin-bottom: 1.5rem;
+				color: var(--text-dark);
+				font-weight: 500;
+			}
+
+			.content-interpretation {
+				background: var(--bg-light);
+				padding: 1.5rem;
+				border-radius: 12px;
+				margin-bottom: 1.5rem;
+				border-left: 4px solid var(--primary-color);
+			}
+
+			.keywords-section {
+				margin-top: 1.5rem;
+			}
+
+			.keywords-title {
+				font-weight: 600;
+				margin-bottom: 0.75rem;
+				color: var(--text-dark);
+			}
+
+			.keywords-list {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+			}
+
+			.keyword-tag {
+				background: var(--gradient-primary);
+				color: white;
+				padding: 0.25rem 0.75rem;
+				border-radius: 20px;
+				font-size: 0.875rem;
+				font-weight: 500;
+			}
+
+			.sidebar {
+				display: flex;
+				flex-direction: column;
+				gap: 1.5rem;
+			}
+
+			.stats-card {
+				background: var(--bg-white);
+				border-radius: 16px;
+				padding: 1.5rem;
+				box-shadow: var(--shadow-md);
+				border: 1px solid var(--border-color);
+			}
+
+			.stats-title {
+				font-size: 1.1rem;
+				font-weight: 600;
+				margin-bottom: 1rem;
+				color: var(--text-dark);
+			}
+
+			.stat-item {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 0.5rem 0;
+				border-bottom: 1px solid var(--border-color);
+			}
+
+			.stat-item:last-child {
+				border-bottom: none;
+			}
+
+			.stat-label {
+				color: var(--text-light);
+				font-size: 0.9rem;
+			}
+
+			.stat-value {
+				font-weight: 600;
+				color: var(--primary-color);
+			}
+
+			.loading {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: 3rem;
+				color: var(--text-light);
+			}
+
+			.spinner {
+				width: 40px;
+				height: 40px;
+				border: 4px solid var(--border-color);
+				border-left-color: var(--primary-color);
+				border-radius: 50%;
+				animation: spin 1s linear infinite;
+				margin-right: 1rem;
+			}
+
+			@keyframes spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+
+			.error-message {
+				background: rgba(245, 101, 101, 0.1);
+				color: var(--error-color);
+				padding: 1rem;
+				border-radius: 8px;
+				text-align: center;
+				margin: 1rem 0;
+			}
+
+			.cache-indicator {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.25rem;
+				font-size: 0.875rem;
+				color: var(--text-light);
+				margin-left: 1rem;
+			}
+
+			/* 响应式设计 */
+			@media (max-width: 768px) {
+				.hero-title {
+					font-size: 2.5rem;
+				}
+
+				.hero-subtitle {
+					font-size: 1.1rem;
+				}
+
+				.landing-container {
+					padding: 1rem;
+				}
+
+				.features-grid {
+					grid-template-columns: 1fr;
+					gap: 1rem;
+				}
+
+				.learning-tabs {
+					justify-content: center;
+				}
+
+				.tab-button {
+					flex: 1;
+					justify-content: center;
+					min-width: 120px;
+				}
+
+				.header-container {
+					padding: 0 1rem;
+					flex-direction: column;
+					gap: 1rem;
+				}
+
+				.app-main {
+					padding: 1rem;
+				}
+
+				.content-header {
+					flex-direction: column;
+					gap: 1rem;
+					align-items: flex-start;
+				}
+			}
+
+			@media (max-width: 480px) {
+				.hero-title {
+					font-size: 2rem;
+				}
+
+				.feature-card {
+					padding: 1.5rem;
+				}
+
+				.content-main {
+					font-size: 1.25rem;
+				}
+
+				.learning-tabs {
+					flex-direction: column;
+				}
+
+				.tab-button {
+					flex: none;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<!-- 索引页面 -->
+		<div id="landingPage" class="landing-page">
+			<div class="landing-container">
+				<div class="hero-section">
+					<h1 class="hero-title">📚 每日学习助手</h1>
+					<p class="hero-subtitle">基于豆包大模型的智能学习内容推荐系统</p>
+					<p class="hero-description">
+						每天为全球用户推送精选的英语谚语、中文古诗词和中医基础知识，让学习成为一种习惯
+					</p>
+				</div>
+
+				<div class="features-grid">
+					<div
+						class="feature-card"
+						onclick="Router.navigate('/app/english')"
+						style="cursor: pointer"
+					>
+						<div class="feature-icon">🇺🇸</div>
+						<h3 class="feature-title">英语谚语</h3>
+						<p class="feature-desc">
+							传统谚语、格言、习语，提升英语理解能力和文化素养
+						</p>
+					</div>
+					<div
+						class="feature-card"
+						onclick="Router.navigate('/app/chinese')"
+						style="cursor: pointer"
+					>
+						<div class="feature-icon">🇨🇳</div>
+						<h3 class="feature-title">中文古诗词</h3>
+						<p class="feature-desc">
+							古诗、词、赋等传统文化瑰宝，传承中华文化精髓
+						</p>
+					</div>
+					<div
+						class="feature-card"
+						onclick="Router.navigate('/app/tcm')"
+						style="cursor: pointer"
+					>
+						<div class="feature-icon">🌿</div>
+						<h3 class="feature-title">中医基础</h3>
+						<p class="feature-desc">
+							《黄帝内经》、《伤寒论》等经典条文，了解中医理论和基础知识
+						</p>
+					</div>
+				</div>
+
+				<button class="cta-button" onclick="enterApp()">
+					<i class="fas fa-rocket"></i> 开始学习之旅
+				</button>
+			</div>
+		</div>
+
+		<!-- 应用页面 -->
+		<div id="appPage" class="app-page">
+			<header class="app-header">
+				<div class="header-container">
+					<div class="app-logo" onclick="goHome()" style="cursor: pointer">
+						<i class="fas fa-graduation-cap"></i>
+						每日学习助手
+					</div>
+					<div id="statusIndicator" class="status-indicator">
+						<i class="fas fa-circle"></i>
+						<span>检查中...</span>
+					</div>
+				</div>
+			</header>
+
+			<main class="app-main">
+				<div class="learning-tabs">
+					<button class="tab-button active" data-type="english">
+						<i class="fas fa-globe-americas"></i>
+						英语谚语
+					</button>
+					<button class="tab-button" data-type="chinese">
+						<i class="fas fa-yin-yang"></i>
+						中文古诗词
+					</button>
+					<button class="tab-button" data-type="tcm">
+						<i class="fas fa-leaf"></i>
+						中医基础
+					</button>
+				</div>
+
+				<div class="learning-content">
+					<div class="content-card">
+						<div class="content-header">
+							<div class="content-type" id="contentType">英语谚语</div>
+							<button
+								class="refresh-button"
+								id="refreshBtn"
+								onclick="loadContent(true)"
+							>
+								<i class="fas fa-sync-alt icon"></i> 刷新
+							</button>
+						</div>
+
+						<div id="contentContainer">
+							<div class="loading">
+								<div class="spinner"></div>
+								正在加载内容...
+							</div>
+						</div>
+					</div>
+				</div>
+			</main>
+		</div>
+
+		<script>
+			const API_BASE = "https://everyday-study-backend.onrender.com/api";
+			let currentType = "english";
+			let isLoading = false;
+
+			const typeNames = {
+				english: "英语谚语",
+				chinese: "中文古诗词",
+				tcm: "中医基础",
+			};
+
+			const typeIcons = {
+				english: "🇺🇸",
+				chinese: "🇨🇳",
+				tcm: "🌿",
+			};
+
+			// 路由管理器
+			const Router = {
+				// 获取当前路由
+				getCurrentRoute() {
+					return window.location.hash.slice(1) || "/";
+				},
+
+				// 导航到指定路由
+				navigate(path) {
+					window.location.hash = path;
+				},
+
+				// 解析路由
+				parseRoute(route) {
+					const parts = route.split("/").filter(Boolean);
+					return {
+						page: parts[0] || "home",
+						type: parts[1] || "english",
+					};
+				},
+
+				// 路由处理
+				handleRoute() {
+					const route = this.getCurrentRoute();
+					const { page, type } = this.parseRoute(route);
+
+					console.log("路由变化:", route, { page, type });
+
+					if (page === "app") {
+						this.showAppPage(type);
+					} else {
+						this.showHomePage();
+					}
+				},
+
+				// 显示首页
+				showHomePage() {
+					document.getElementById("landingPage").style.display = "block";
+					document.getElementById("appPage").style.display = "none";
+					document.title = "每日学习助手 - AI 智能学习内容推荐";
+				},
+
+				// 显示应用页面
+				showAppPage(type = "english") {
+					document.getElementById("landingPage").style.display = "none";
+					document.getElementById("appPage").style.display = "block";
+					document.title = `${typeNames[type]} - 每日学习助手`;
+
+					// 设置当前类型
+					if (currentType !== type) {
+						currentType = type;
+						this.updateActiveTab(type);
+						document.getElementById("contentType").textContent =
+							typeNames[type];
+					}
+
+					// 检查 API 状态（只在首次进入应用页面时检查）
+					if (!window.apiHealthChecked) {
+						checkApiHealth();
+						window.apiHealthChecked = true;
+					}
+
+					// 加载内容
+					loadContent();
+				},
+
+				// 更新活跃标签
+				updateActiveTab(type) {
+					document.querySelectorAll(".tab-button").forEach((btn) => {
+						btn.classList.remove("active");
+					});
+					const activeBtn = document.querySelector(`[data-type="${type}"]`);
+					if (activeBtn) {
+						activeBtn.classList.add("active");
+					}
+				},
+
+				// 初始化路由
+				init() {
+					// 监听路由变化
+					window.addEventListener("hashchange", () => {
+						this.handleRoute();
+					});
+
+					// 处理初始路由
+					this.handleRoute();
+				},
+			};
+
+			// 本地缓存管理
+			const CacheManager = {
+				// 获取今天的日期字符串（YYYY-MM-DD）
+				getTodayKey() {
+					return new Date().toISOString().split("T")[0];
+				},
+
+				// 获取缓存的键名
+				getCacheKey(type) {
+					return `learning_content_${type}`;
+				},
+
+				// 保存内容到本地缓存
+				saveContent(type, content) {
+					try {
+						const cacheData = {
+							content: content,
+							date: this.getTodayKey(),
+							timestamp: Date.now(),
+						};
+						localStorage.setItem(
+							this.getCacheKey(type),
+							JSON.stringify(cacheData)
+						);
+					} catch (error) {
+						console.warn("保存缓存失败:", error);
+					}
+				},
+
+				// 从本地缓存获取内容
+				getContent(type) {
+					try {
+						const cached = localStorage.getItem(this.getCacheKey(type));
+						if (!cached) return null;
+
+						const cacheData = JSON.parse(cached);
+						const today = this.getTodayKey();
+
+						// 检查是否是今天的缓存
+						if (cacheData.date === today) {
+							return cacheData.content;
+						} else {
+							// 过期缓存，删除
+							this.clearContent(type);
+							return null;
+						}
+					} catch (error) {
+						console.warn("读取缓存失败:", error);
+						return null;
+					}
+				},
+
+				// 清除指定类型的缓存
+				clearContent(type) {
+					try {
+						localStorage.removeItem(this.getCacheKey(type));
+					} catch (error) {
+						console.warn("清除缓存失败:", error);
+					}
+				},
+
+				// 清除所有过期缓存
+				clearExpiredCache() {
+					const today = this.getTodayKey();
+					["english", "chinese", "tcm"].forEach((type) => {
+						try {
+							const cached = localStorage.getItem(this.getCacheKey(type));
+							if (cached) {
+								const cacheData = JSON.parse(cached);
+								if (cacheData.date !== today) {
+									this.clearContent(type);
+								}
+							}
+						} catch (error) {
+							console.warn(`清除 ${type} 过期缓存失败:`, error);
+						}
+					});
+				},
+			};
+
+			// 进入应用
+			function enterApp() {
+				Router.navigate("/app/english");
+			}
+
+			// 返回首页
+			function goHome() {
+				Router.navigate("/");
+			}
+
+			// 检查 API 健康状态
+			async function checkApiHealth() {
+				const statusIndicator = document.getElementById("statusIndicator");
+
+				try {
+					const response = await fetch(`${API_BASE}/health`);
+					const data = await response.json();
+
+					if (data.success) {
+						statusIndicator.className = "status-indicator status-online";
+						statusIndicator.innerHTML =
+							'<i class="fas fa-circle"></i><span>服务正常</span>';
+					} else {
+						throw new Error("API 返回错误");
+					}
+				} catch (error) {
+					statusIndicator.className = "status-indicator status-offline";
+					statusIndicator.innerHTML =
+						'<i class="fas fa-circle"></i><span>服务异常</span>';
+					console.error("健康检查失败:", error);
+				}
+			}
+
+			// 切换学习类型
+			function switchType(type) {
+				// 通过路由导航，而不是直接切换
+				Router.navigate(`/app/${type}`);
+			}
+
+			// 加载学习内容
+			async function loadContent(forceRefresh = false) {
+				const refreshBtn = document.getElementById("refreshBtn");
+				const contentContainer = document.getElementById("contentContainer");
+
+				// 如果不是强制刷新，先检查本地缓存
+				if (!forceRefresh) {
+					const cachedContent = CacheManager.getContent(currentType);
+					if (cachedContent) {
+						console.log(`使用本地缓存的${typeNames[currentType]}内容`);
+						// 标记为来自缓存
+						cachedContent.from_cache = true;
+						displayContent(cachedContent);
+						return;
+					}
+				}
+
+				// 如果已经在加载中，直接返回
+				if (isLoading) {
+					console.log("正在加载中，跳过重复请求");
+					return;
+				}
+
+				isLoading = true;
+
+				// 更新按钮状态
+				refreshBtn.disabled = true;
+				refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 加载中';
+
+				// 显示加载状态
+				contentContainer.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    正在加载今日${typeNames[currentType]}...
+                </div>
+            `;
+
+				try {
+					const response = await fetch(
+						`${API_BASE}/today-learning/${currentType}`
+					);
+					const data = await response.json();
+
+					if (data.success) {
+						// 保存到本地缓存
+						CacheManager.saveContent(currentType, data.data);
+						displayContent(data.data);
+						console.log(`从服务器获取${typeNames[currentType]}内容`);
+					} else {
+						throw new Error(data.message || "获取内容失败");
+					}
+				} catch (error) {
+					contentContainer.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        加载失败：${error.message}
+                        <br><small>请检查网络连接或稍后再试</small>
+                    </div>
+                `;
+					console.error("加载内容失败:", error);
+				} finally {
+					isLoading = false;
+					refreshBtn.disabled = false;
+					refreshBtn.innerHTML = '<i class="fas fa-sync-alt icon"></i> 刷新';
+				}
+			}
+
+			// 显示学习内容
+			function displayContent(content) {
+				const contentContainer = document.getElementById("contentContainer");
+				const typeIcon = typeIcons[content.type] || "📚";
+
+				let contentHTML = `
+                <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                    <span style="font-size: 1.5rem; margin-right: 0.5rem;">${typeIcon}</span>
+                    <span style="font-weight: 600; color: var(--text-dark);">今日内容</span>
+                </div>
+                <div class="content-main">${content.content}</div>
+            `;
+
+				if (content.interpretation) {
+					contentHTML += `
+                    <div class="content-interpretation">
+                        <strong>释义：</strong>${content.interpretation}
+                    </div>
+                `;
+				}
+
+				if (content.key_words && content.key_words.length > 0) {
+					contentHTML += `
+                    <div class="keywords-section">
+                        <div class="keywords-title">关键词解析</div>
+                        <div class="keywords-list">
+                            ${content.key_words
+															.map(
+																(keyword) =>
+																	`<span class="keyword-tag">${keyword}</span>`
+															)
+															.join("")}
+                        </div>
+                    </div>
+                `;
+				}
+
+				contentContainer.innerHTML = contentHTML;
+			}
+
+			// 加载统计数据
+			async function loadStats() {
+				const statsContainer = document.getElementById("statsContainer");
+
+				try {
+					const response = await fetch(`${API_BASE}/stats`);
+					const data = await response.json();
+
+					if (data.success && data.data.stats) {
+						displayStats(data.data.stats);
+					} else {
+						throw new Error("获取统计数据失败");
+					}
+				} catch (error) {
+					statsContainer.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        统计数据加载失败
+                    </div>
+                `;
+					console.error("加载统计失败:", error);
+				}
+			}
+
+			// 显示统计数据
+			function displayStats(stats) {
+				const statsContainer = document.getElementById("statsContainer");
+
+				const totalDays =
+					(stats.english || 0) + (stats.chinese || 0) + (stats.tcm || 0);
+
+				const statsHTML = `
+                <div class="stat-item">
+                    <span class="stat-label">英语谚语</span>
+                    <span class="stat-value">${stats.english || 0} 天</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">中文古诗词</span>
+                    <span class="stat-value">${stats.chinese || 0} 天</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">中医基础</span>
+                    <span class="stat-value">${stats.tcm || 0} 天</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">总学习天数</span>
+                    <span class="stat-value">${totalDays} 天</span>
+                </div>
+            `;
+
+				statsContainer.innerHTML = statsHTML;
+			}
+
+			// 绑定标签页切换事件
+			document.querySelectorAll(".tab-button").forEach((button) => {
+				button.addEventListener("click", () => {
+					const type = button.dataset.type;
+					switchType(type);
+				});
+			});
+
+			// 定期检查服务状态
+			setInterval(checkApiHealth, 30000); // 每30秒检查一次
+
+			// 页面加载完成后的初始化
+			document.addEventListener("DOMContentLoaded", () => {
+				// 清除过期的本地缓存
+				CacheManager.clearExpiredCache();
+
+				// 初始化路由系统
+				Router.init();
+
+				console.log("每日学习助手已加载完成");
+			});
+		</script>
+	</body>
+</html>
