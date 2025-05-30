@@ -47,7 +47,6 @@
 				background: var(--bg-light);
 			}
 
-			/* 索引页面样式 */
 			.landing-page {
 				min-height: 100vh;
 				background: var(--gradient-primary);
@@ -231,7 +230,6 @@
 				}
 			}
 
-			/* 应用页面样式 */
 			.app-page {
 				display: none;
 				min-height: 100vh;
@@ -350,13 +348,20 @@
 				gap: 2rem;
 			}
 
+			.header-actions {
+				display: flex;
+				gap: 0.75rem;
+				align-items: center;
+			}
+
 			.content-type {
 				font-size: 1.25rem;
 				font-weight: 600;
 				color: var(--text-dark);
 			}
 
-			.refresh-button {
+			.refresh-button,
+			.speak-button {
 				background: rgba(102, 126, 234, 0.1);
 				color: var(--primary-color);
 				border: 2px solid rgba(102, 126, 234, 0.2);
@@ -371,14 +376,16 @@
 				font-size: 0.9rem;
 			}
 
-			.refresh-button:hover:not(:disabled) {
+			.refresh-button:hover:not(:disabled),
+			.speak-button:hover:not(:disabled) {
 				background: rgba(102, 126, 234, 0.15);
 				border-color: rgba(102, 126, 234, 0.4);
 				transform: translateY(-1px);
 				box-shadow: var(--shadow-sm);
 			}
 
-			.refresh-button:disabled {
+			.refresh-button:disabled,
+			.speak-button:disabled {
 				opacity: 0.5;
 				cursor: not-allowed;
 				transform: none;
@@ -391,6 +398,32 @@
 
 			.refresh-button:hover:not(:disabled) .icon {
 				transform: rotate(90deg);
+			}
+
+			.speak-button {
+				background: rgba(72, 187, 120, 0.1);
+				color: var(--success-color);
+				border-color: rgba(72, 187, 120, 0.2);
+			}
+
+			.speak-button:hover:not(:disabled) {
+				background: rgba(72, 187, 120, 0.15);
+				border-color: rgba(72, 187, 120, 0.4);
+			}
+
+			.speak-button:disabled {
+				background: rgba(72, 187, 120, 0.05);
+			}
+
+			.speak-button.speaking {
+				background: rgba(245, 101, 101, 0.1);
+				color: var(--error-color);
+				border-color: rgba(245, 101, 101, 0.2);
+			}
+
+			.speak-button.speaking:hover {
+				background: rgba(245, 101, 101, 0.15);
+				border-color: rgba(245, 101, 101, 0.4);
 			}
 
 			.content-main {
@@ -519,7 +552,6 @@
 				margin-left: 1rem;
 			}
 
-			/* 响应式设计 */
 			@media (max-width: 768px) {
 				.hero-title {
 					font-size: 2.5rem;
@@ -563,6 +595,11 @@
 					gap: 1rem;
 					align-items: flex-start;
 				}
+
+				.header-actions {
+					align-self: stretch;
+					justify-content: space-between;
+				}
 			}
 
 			@media (max-width: 480px) {
@@ -589,7 +626,6 @@
 		</style>
 	</head>
 	<body>
-		<!-- 索引页面 -->
 		<div id="landingPage" class="landing-page">
 			<div class="landing-container">
 				<div class="hero-section">
@@ -642,7 +678,6 @@
 			</div>
 		</div>
 
-		<!-- 应用页面 -->
 		<div id="appPage" class="app-page">
 			<header class="app-header">
 				<div class="header-container">
@@ -677,13 +712,23 @@
 					<div class="content-card">
 						<div class="content-header">
 							<div class="content-type" id="contentType">英语谚语</div>
-							<button
-								class="refresh-button"
-								id="refreshBtn"
-								onclick="loadContent(true)"
-							>
-								<i class="fas fa-sync-alt icon"></i> 刷新
-							</button>
+							<div class="header-actions">
+								<button
+									class="speak-button"
+									id="speakBtn"
+									onclick="toggleSpeech()"
+									style="display: none"
+								>
+									<i class="fas fa-volume-up"></i> 朗读
+								</button>
+								<button
+									class="refresh-button"
+									id="refreshBtn"
+									onclick="loadContent(true)"
+								>
+									<i class="fas fa-sync-alt icon"></i> 刷新
+								</button>
+							</div>
 						</div>
 
 						<div id="contentContainer">
@@ -714,19 +759,15 @@
 				tcm: "🌿",
 			};
 
-			// 路由管理器
 			const Router = {
-				// 获取当前路由
 				getCurrentRoute() {
 					return window.location.hash.slice(1) || "/";
 				},
 
-				// 导航到指定路由
 				navigate(path) {
 					window.location.hash = path;
 				},
 
-				// 解析路由
 				parseRoute(route) {
 					const parts = route.split("/").filter(Boolean);
 					return {
@@ -735,7 +776,6 @@
 					};
 				},
 
-				// 路由处理
 				handleRoute() {
 					const route = this.getCurrentRoute();
 					const { page, type } = this.parseRoute(route);
@@ -749,20 +789,17 @@
 					}
 				},
 
-				// 显示首页
 				showHomePage() {
 					document.getElementById("landingPage").style.display = "block";
 					document.getElementById("appPage").style.display = "none";
 					document.title = "每日学习助手 - AI 智能学习内容推荐";
 				},
 
-				// 显示应用页面
 				showAppPage(type = "english") {
 					document.getElementById("landingPage").style.display = "none";
 					document.getElementById("appPage").style.display = "block";
 					document.title = `${typeNames[type]} - 每日学习助手`;
 
-					// 设置当前类型
 					if (currentType !== type) {
 						currentType = type;
 						this.updateActiveTab(type);
@@ -770,17 +807,14 @@
 							typeNames[type];
 					}
 
-					// 检查 API 状态（只在首次进入应用页面时检查）
 					if (!window.apiHealthChecked) {
 						checkApiHealth();
 						window.apiHealthChecked = true;
 					}
 
-					// 加载内容
 					loadContent();
 				},
 
-				// 更新活跃标签
 				updateActiveTab(type) {
 					document.querySelectorAll(".tab-button").forEach((btn) => {
 						btn.classList.remove("active");
@@ -791,31 +825,106 @@
 					}
 				},
 
-				// 初始化路由
 				init() {
-					// 监听路由变化
 					window.addEventListener("hashchange", () => {
 						this.handleRoute();
 					});
 
-					// 处理初始路由
 					this.handleRoute();
 				},
 			};
 
-			// 本地缓存管理
+			const SpeechManager = {
+				synthesis: window.speechSynthesis,
+				currentUtterance: null,
+				isSupported: "speechSynthesis" in window,
+
+				init() {
+					if (!this.isSupported) {
+						console.warn("浏览器不支持语音合成功能");
+						return false;
+					}
+					return true;
+				},
+
+				speak(text, lang = "en-US") {
+					if (!this.isSupported) {
+						alert("您的浏览器不支持语音朗读功能");
+						return;
+					}
+
+					this.stop();
+
+					const utterance = new SpeechSynthesisUtterance(text);
+					utterance.lang = lang;
+					utterance.rate = 0.8;
+					utterance.pitch = 1.0;
+					utterance.volume = 1.0;
+
+					utterance.onstart = () => {
+						this.updateSpeakButton(true);
+					};
+
+					utterance.onend = () => {
+						this.updateSpeakButton(false);
+						this.currentUtterance = null;
+					};
+
+					utterance.onerror = (error) => {
+						console.error("语音合成错误:", error);
+						this.updateSpeakButton(false);
+						this.currentUtterance = null;
+					};
+
+					this.currentUtterance = utterance;
+					this.synthesis.speak(utterance);
+				},
+
+				stop() {
+					if (this.synthesis.speaking) {
+						this.synthesis.cancel();
+					}
+					this.updateSpeakButton(false);
+					this.currentUtterance = null;
+				},
+
+				toggle(text, lang = "en-US") {
+					if (this.synthesis.speaking) {
+						this.stop();
+					} else {
+						this.speak(text, lang);
+					}
+				},
+
+				updateSpeakButton(isSpeaking) {
+					const speakBtn = document.getElementById("speakBtn");
+					if (!speakBtn) return;
+
+					if (isSpeaking) {
+						speakBtn.classList.add("speaking");
+						speakBtn.innerHTML = '<i class="fas fa-stop"></i> 停止';
+					} else {
+						speakBtn.classList.remove("speaking");
+						speakBtn.innerHTML = '<i class="fas fa-volume-up"></i> 朗读';
+					}
+				},
+			};
+
+			function toggleSpeech() {
+				const content = window.currentEnglishContent;
+				if (content) {
+					SpeechManager.toggle(content);
+				}
+			}
 			const CacheManager = {
-				// 获取今天的日期字符串（YYYY-MM-DD）
 				getTodayKey() {
 					return new Date().toISOString().split("T")[0];
 				},
 
-				// 获取缓存的键名
 				getCacheKey(type) {
 					return `learning_content_${type}`;
 				},
 
-				// 保存内容到本地缓存
 				saveContent(type, content) {
 					try {
 						const cacheData = {
@@ -832,7 +941,6 @@
 					}
 				},
 
-				// 从本地缓存获取内容
 				getContent(type) {
 					try {
 						const cached = localStorage.getItem(this.getCacheKey(type));
@@ -841,11 +949,9 @@
 						const cacheData = JSON.parse(cached);
 						const today = this.getTodayKey();
 
-						// 检查是否是今天的缓存
 						if (cacheData.date === today) {
 							return cacheData.content;
 						} else {
-							// 过期缓存，删除
 							this.clearContent(type);
 							return null;
 						}
@@ -855,7 +961,6 @@
 					}
 				},
 
-				// 清除指定类型的缓存
 				clearContent(type) {
 					try {
 						localStorage.removeItem(this.getCacheKey(type));
@@ -864,7 +969,6 @@
 					}
 				},
 
-				// 清除所有过期缓存
 				clearExpiredCache() {
 					const today = this.getTodayKey();
 					["english", "chinese", "tcm"].forEach((type) => {
@@ -883,17 +987,14 @@
 				},
 			};
 
-			// 进入应用
 			function enterApp() {
 				Router.navigate("/app/english");
 			}
 
-			// 返回首页
 			function goHome() {
 				Router.navigate("/");
 			}
 
-			// 检查 API 健康状态
 			async function checkApiHealth() {
 				const statusIndicator = document.getElementById("statusIndicator");
 
@@ -916,30 +1017,24 @@
 				}
 			}
 
-			// 切换学习类型
 			function switchType(type) {
-				// 通过路由导航，而不是直接切换
 				Router.navigate(`/app/${type}`);
 			}
 
-			// 加载学习内容
 			async function loadContent(forceRefresh = false) {
 				const refreshBtn = document.getElementById("refreshBtn");
 				const contentContainer = document.getElementById("contentContainer");
 
-				// 如果不是强制刷新，先检查本地缓存
 				if (!forceRefresh) {
 					const cachedContent = CacheManager.getContent(currentType);
 					if (cachedContent) {
 						console.log(`使用本地缓存的${typeNames[currentType]}内容`);
-						// 标记为来自缓存
 						cachedContent.from_cache = true;
 						displayContent(cachedContent);
 						return;
 					}
 				}
 
-				// 如果已经在加载中，直接返回
 				if (isLoading) {
 					console.log("正在加载中，跳过重复请求");
 					return;
@@ -947,11 +1042,9 @@
 
 				isLoading = true;
 
-				// 更新按钮状态
 				refreshBtn.disabled = true;
 				refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 加载中';
 
-				// 显示加载状态
 				contentContainer.innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
@@ -966,7 +1059,6 @@
 					const data = await response.json();
 
 					if (data.success) {
-						// 保存到本地缓存
 						CacheManager.saveContent(currentType, data.data);
 						displayContent(data.data);
 						console.log(`从服务器获取${typeNames[currentType]}内容`);
@@ -989,10 +1081,20 @@
 				}
 			}
 
-			// 显示学习内容
 			function displayContent(content) {
 				const contentContainer = document.getElementById("contentContainer");
+				const speakBtn = document.getElementById("speakBtn");
 				const typeIcon = typeIcons[content.type] || "📚";
+
+				if (content.type === "english") {
+					speakBtn.style.display = "flex";
+					window.currentEnglishContent = content.content;
+					SpeechManager.stop();
+				} else {
+					speakBtn.style.display = "none";
+					window.currentEnglishContent = null;
+					SpeechManager.stop();
+				}
 
 				let contentHTML = `
                 <div style="display: flex; align-items: center; margin-bottom: 1rem;">
@@ -1029,7 +1131,6 @@
 				contentContainer.innerHTML = contentHTML;
 			}
 
-			// 加载统计数据
 			async function loadStats() {
 				const statsContainer = document.getElementById("statsContainer");
 
@@ -1053,7 +1154,6 @@
 				}
 			}
 
-			// 显示统计数据
 			function displayStats(stats) {
 				const statsContainer = document.getElementById("statsContainer");
 
@@ -1082,7 +1182,6 @@
 				statsContainer.innerHTML = statsHTML;
 			}
 
-			// 绑定标签页切换事件
 			document.querySelectorAll(".tab-button").forEach((button) => {
 				button.addEventListener("click", () => {
 					const type = button.dataset.type;
@@ -1090,15 +1189,13 @@
 				});
 			});
 
-			// 定期检查服务状态
-			setInterval(checkApiHealth, 30000); // 每30秒检查一次
+			setInterval(checkApiHealth, 30000);
 
-			// 页面加载完成后的初始化
 			document.addEventListener("DOMContentLoaded", () => {
-				// 清除过期的本地缓存
 				CacheManager.clearExpiredCache();
 
-				// 初始化路由系统
+				SpeechManager.init();
+
 				Router.init();
 
 				console.log("每日学习助手已加载完成");
